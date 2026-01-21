@@ -1,0 +1,324 @@
+/**
+ * ============================================================================
+ * BERIT - ALIANÇA SAGRADA | Global Styles
+ * ============================================================================
+ *
+ * DESIGN SYSTEM:
+ * - Background: Pure Black (#000000) - Templo Digital
+ * - Text: zinc-300 (#d4d4d8) - Legibilidade suave
+ * - Accent: Ouro Aliança (#c5a059) - Elementos sagrados
+ * - Transitions: 700ms+ - Atmosfera contemplativa
+ *
+ * TAILWIND CLASSES LEGEND:
+ * - bg-berit-black: Fundo principal puro
+ * - text-berit-text: Texto padrão zinc-300
+ * - text-berit-gold / border-berit-gold: Elementos de Aliança
+ * - font-serif: Texto bíblico (Merriweather)
+ * - font-sans: Interface (Inter)
+ * - transition-berit: Transição lenta contemplativa
+ *
+ * MAINTENANCE NOTES:
+ * - Grain overlay usa pseudo-elemento em .berit-grain
+ * - Todas as cores devem respeitar o tema escuro puro
+ * - Transições mínimas de 700ms para atmosfera
+ * ============================================================================
+ */
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Berit Core Colors */
+  --berit-black: #000000;
+  --berit-text: #d4d4d8;
+  --berit-gold: #c5a059;
+  --berit-gold-dim: #8b7040;
+  --berit-surface: #0a0a0a;
+  --berit-border: #1a1a1a;
+
+  /* System Tokens mapped to Berit (User's definitions take precedence) */
+  --background: #000000; /* Maps to berit-black */
+  --foreground: #d4d4d8; /* Maps to berit-text */
+  --card: #0a0a0a;       /* Maps to berit-surface */
+  --card-foreground: #d4d4d8; /* Maps to berit-text */
+  --popover: #0a0a0a;    /* Maps to berit-surface */
+  --popover-foreground: #d4d4d8; /* Maps to berit-text */
+  --primary: #c5a059;    /* Maps to berit-gold */
+  --primary-foreground: #000000; /* Maps to berit-black */
+  --secondary: #1a1a1a;  /* Maps to berit-border */
+  --secondary-foreground: #d4d4d8; /* Maps to berit-text */
+  --muted: #1a1a1a;      /* Maps to berit-border */
+  --muted-foreground: #71717a; /* Tailwind zinc-500 equivalent */
+  --accent: #c5a059;     /* Maps to berit-gold */
+  --accent-foreground: #000000; /* Maps to berit-black */
+  --destructive: #7f1d1d; /* Tailwind red-800 equivalent */
+  --destructive-foreground: #fecaca; /* Tailwind red-200 equivalent */
+  --border: #1a1a1a;     /* Maps to berit-border */
+  --input: #1a1a1a;      /* Maps to berit-border */
+  --ring: #c5a059;       /* Maps to berit-gold */
+  --radius: 0.5rem;
+
+  /* Shadcn/ui Default Tokens (added and preserved for non-colliding tokens) */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0); /* This will be overridden in .dark for Berit's theme */
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  /* Berit-specific dark theme overrides */
+  --background: var(--berit-black);
+  --foreground: var(--berit-text);
+  --card: var(--berit-surface);
+  --card-foreground: var(--berit-text);
+  --popover: var(--berit-surface);
+  --popover-foreground: var(--berit-text);
+  --primary: var(--berit-gold);
+  --primary-foreground: var(--berit-black);
+  --secondary: var(--berit-border);
+  --secondary-foreground: var(--berit-text);
+  --muted: var(--berit-border);
+  --muted-foreground: #71717a; /* Tailwind zinc-500 equivalent */
+  --accent: var(--berit-gold);
+  --accent-foreground: var(--berit-black);
+  --destructive: #7f1d1d; /* Tailwind red-800 equivalent */
+  --destructive-foreground: #fecaca; /* Tailwind red-200 equivalent */
+  --border: var(--berit-border);
+  --input: var(--berit-border);
+  --ring: var(--berit-gold);
+
+  /* Shadcn/ui Default Dark Tokens (added and preserved for non-colliding tokens) */
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: var(--berit-surface); /* Mapped to Berit surface in dark mode */
+  --sidebar-foreground: var(--berit-text);
+  --sidebar-primary: var(--berit-gold);
+  --sidebar-primary-foreground: var(--berit-black);
+  --sidebar-accent: var(--berit-gold-dim);
+  --sidebar-accent-foreground: var(--berit-black);
+  --sidebar-border: var(--berit-border);
+  --sidebar-ring: var(--berit-gold);
+}
+
+@theme inline {
+  /* Berit Custom Fonts */
+  --font-sans: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-serif: 'Merriweather', 'Georgia', serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  /* Berit Custom Colors */
+  --color-berit-black: var(--berit-black);
+  --color-berit-text: var(--berit-text);
+  --color-berit-gold: var(--berit-gold);
+  --color-berit-gold-dim: var(--berit-gold-dim);
+  --color-berit-surface: var(--berit-surface);
+  --color-berit-border: var(--berit-border);
+
+  /* System Colors mapped to Berit (User's definitions take precedence) */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Shadcn/ui Default Theme Inline Tokens (added) */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    background-color: #000000; /* Preserve original Berit html background */
+  }
+
+  body {
+    @apply bg-background text-foreground; /* Use the mapped system tokens */
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Scrollbar styling for dark theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a2a2a;
+  }
+}
+
+/* Berit Custom Utilities - Tailwind v4 syntax */
+@utility transition-berit {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 700ms;
+}
+
+@utility transition-berit-slow {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 1000ms;
+}
+
+@utility berit-glow {
+  box-shadow: 0 0 20px rgba(197, 160, 89, 0.15);
+}
+
+@utility berit-glow-intense {
+  box-shadow: 0 0 40px rgba(197, 160, 89, 0.25);
+}
+
+@layer components {
+  /* Berit Grain Overlay - Subtle texture for Templo Digital atmosphere */
+  .berit-grain {
+    position: relative;
+  }
+
+  .berit-grain::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    z-index: 9999;
+  }
+
+  /* Biblical text styling */
+  .berit-scripture {
+    font-family: var(--font-serif);
+    line-height: 1.625;
+    letter-spacing: 0.025em;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Clickable word in scripture */
+  .berit-word {
+    cursor: pointer;
+    display: inline;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 700ms;
+  }
+
+  .berit-word:hover {
+    color: var(--berit-gold);
+    text-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+  }
+
+  /* Input styling for the sacred portal */
+  .berit-input {
+    background-color: transparent;
+    border-bottom-width: 1px;
+    border-color: var(--berit-border);
+    color: var(--berit-text);
+    text-align: center;
+    padding: 0.75rem 1rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 700ms;
+  }
+
+  .berit-input:focus {
+    border-color: var(--berit-gold);
+    outline: none;
+  }
+
+  /* Save slot card styling */
+  .berit-slot {
+    background-color: var(--berit-surface);
+    border: 1px solid var(--berit-border);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 700ms;
+  }
+
+  .berit-slot:hover {
+    border-color: var(--berit-gold-dim);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.15);
+  }
+
+  .berit-slot.active {
+    border-color: var(--berit-gold);
+    box-shadow: 0 0 40px rgba(197, 160, 89, 0.25);
+  }
+}
+
+@layer utilities {
+  /* Text balance for titles */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
