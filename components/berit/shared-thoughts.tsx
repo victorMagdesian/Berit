@@ -43,14 +43,23 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   // Load initial content
   useEffect(() => {
     const loadContent = async () => {
-      const { data } = await supabase
-        .from('shared_thoughts')
-        .select('content')
-        .eq('slot_id', slotId)
-        .single()
-      
-      if (data) {
-        setContent(data.content || '')
+      try {
+        const { data, error } = await supabase
+          .from('shared_thoughts')
+          .select('content')
+          .eq('slot_id', slotId)
+          .maybeSingle()
+        
+        if (error) {
+          console.log('[v0] SharedThoughts: Table may not exist yet, using local state')
+          return
+        }
+        
+        if (data) {
+          setContent(data.content || '')
+        }
+      } catch (err) {
+        console.log('[v0] SharedThoughts: Error loading content, using local state')
       }
     }
     loadContent()
@@ -82,13 +91,19 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   // Save content to database
   const saveContent = useCallback(async (newContent: string) => {
     setIsSaving(true)
-    await supabase
-      .from('shared_thoughts')
-      .upsert({ 
-        slot_id: slotId, 
-        content: newContent,
-        updated_at: new Date().toISOString()
-      })
+    try {
+      await supabase
+        .from('shared_thoughts')
+        .upsert({ 
+          slot_id: slotId, 
+          content: newContent,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'slot_id'
+        })
+    } catch (err) {
+      console.log('[v0] SharedThoughts: Error saving, continuing with local state')
+    }
     setIsSaving(false)
   }, [slotId, supabase])
 
