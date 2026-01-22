@@ -31,9 +31,10 @@ export function ArchitectMode() {
   const [content, setContent] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
   const supabase = createClient()
+  const isSupabaseAvailable = Boolean(supabase)
 
   const handleSubmit = async () => {
-    if (!category || !content.trim()) return
+    if (!category || !content.trim() || !supabase) return
 
     setStatus('sending')
 
@@ -94,6 +95,11 @@ export function ArchitectMode() {
 
             {/* Content */}
             <div className="p-4 space-y-4">
+              {!isSupabaseAvailable && (
+                <div className="rounded-lg border border-berit-gold/30 bg-berit-black/80 p-3 text-xs text-berit-gold/70">
+                  Supabase indisponível. O feedback ficará desativado até que as credenciais estejam configuradas.
+                </div>
+              )}
               {status === 'sent' ? (
                 <div className="text-center py-8">
                   <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
@@ -154,7 +160,7 @@ export function ArchitectMode() {
 
                       <button
                         onClick={handleSubmit}
-                        disabled={!content.trim() || status === 'sending'}
+                        disabled={!content.trim() || status === 'sending' || !isSupabaseAvailable}
                         className="w-full py-3 bg-berit-gold/10 border border-berit-gold/30 
                                  text-berit-gold rounded-lg flex items-center justify-center gap-2
                                  hover:bg-berit-gold/20 transition-berit

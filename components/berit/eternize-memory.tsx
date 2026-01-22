@@ -31,8 +31,15 @@ interface EternizeMemoryProps {
 export function EternizeMemory({ slotId, currentVerse }: EternizeMemoryProps) {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const supabase = createClient()
+  const isSupabaseAvailable = Boolean(supabase)
 
   const handleEternize = async () => {
+    if (!supabase) {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 3000)
+      return
+    }
+
     setStatus('saving')
 
     try {
@@ -69,7 +76,7 @@ export function EternizeMemory({ slotId, currentVerse }: EternizeMemoryProps) {
   return (
     <button
       onClick={handleEternize}
-      disabled={status === 'saving'}
+      disabled={status === 'saving' || !isSupabaseAvailable}
       className={`
         flex items-center gap-2 px-4 py-2 rounded-lg text-sm
         transition-berit
@@ -88,10 +95,11 @@ export function EternizeMemory({ slotId, currentVerse }: EternizeMemoryProps) {
       {status === 'idle' && <Sparkles className="w-4 h-4" />}
       
       <span>
-        {status === 'saving' && 'Eternizando...'}
-        {status === 'saved' && 'Memória Eternizada'}
-        {status === 'error' && 'Tentar Novamente'}
-        {status === 'idle' && 'Eternizar Memória'}
+        {!isSupabaseAvailable && 'Supabase indisponível'}
+        {isSupabaseAvailable && status === 'saving' && 'Eternizando...'}
+        {isSupabaseAvailable && status === 'saved' && 'Memória Eternizada'}
+        {isSupabaseAvailable && status === 'error' && 'Tentar Novamente'}
+        {isSupabaseAvailable && status === 'idle' && 'Eternizar Memória'}
       </span>
     </button>
   )
