@@ -31,6 +31,8 @@ interface SharedThoughtsProps {
   slotId: string
 }
 
+type SupabaseClient = NonNullable<ReturnType<typeof createClient>>
+
 export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   const [content, setContent] = useState('')
   const [isConnected, setIsConnected] = useState(false)
@@ -38,10 +40,13 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   const [isSaving, setIsSaving] = useState(false)
   const supabase = createClient()
   const debounceRef = useRef<NodeJS.Timeout>()
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+  const channelRef = useRef<ReturnType<SupabaseClient['channel']> | null>(null)
+  const isSupabaseAvailable = Boolean(supabase)
 
   // Load initial content
   useEffect(() => {
+    if (!supabase) return
+
     const loadContent = async () => {
       try {
         const { data, error } = await supabase
@@ -67,6 +72,8 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
 
   // Setup realtime subscription
   useEffect(() => {
+    if (!supabase) return
+
     const channel = supabase.channel(`thoughts-${slotId}`)
     channelRef.current = channel
 
@@ -90,6 +97,8 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
 
   // Save content to database
   const saveContent = useCallback(async (newContent: string) => {
+    if (!supabase) return
+
     setIsSaving(true)
     try {
       await supabase
@@ -111,6 +120,8 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value
     setContent(newContent)
+
+    if (!supabase) return
 
     // Broadcast typing indicator
     channelRef.current?.send({
@@ -145,6 +156,9 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
         </div>
         
         <div className="flex items-center gap-2">
+          {!isSupabaseAvailable && (
+            <span className="text-berit-gold/60 text-xs">Modo local</span>
+          )}
           {isSaving && (
             <span className="text-berit-gold/50 text-xs">Salvando...</span>
           )}
@@ -165,7 +179,11 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
       <textarea
         value={content}
         onChange={handleChange}
-        placeholder="Compartilhe seus pensamentos..."
+        placeholder={
+          isSupabaseAvailable
+            ? "Compartilhe seus pensamentos..."
+            : "Supabase indisponível: salvamento local ativo."
+        }
         className={`
           w-full h-32 p-4 bg-berit-surface border border-berit-border rounded-lg
           text-berit-text placeholder:text-berit-text/30 resize-none
