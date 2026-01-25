@@ -1,15 +1,15 @@
 import { redirect } from 'next/navigation'
-import { BeritApp } from '@/components/berit/berit-app'
+import { PassphraseGate } from '@/components/berit/passphrase-gate'
 import { getBeritActivationStatus } from '@/lib/berit/access'
 
 export const dynamic = 'force-dynamic'
 
-export default async function BeritPage() {
+export default async function GatePage() {
   const { activated } = await getBeritActivationStatus()
 
-  if (!activated) {
-    redirect('/gate')
+  if (activated) {
+    redirect('/')
   }
 
-  return <BeritApp />
+  return <PassphraseGate />
 }

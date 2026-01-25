@@ -36,7 +36,7 @@ import { SharedThoughts } from './shared-thoughts'
 import { EternizeMemory } from './eternize-memory'
 import { ArchitectMode } from './architect-mode'
 import { beritConfig } from '@/lib/berit-config'
-import { BookOpen, Search, ArrowLeft, Settings } from 'lucide-react'
+import { BookOpen, Search, ArrowLeft, Settings, ExternalLink } from 'lucide-react'
 
 interface LaboratorioProps {
   slotId: string
@@ -51,6 +51,7 @@ export function Laboratorio({ slotId, onBack }: LaboratorioProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [compareMode, setCompareMode] = useState(beritConfig.alwaysCompare)
+  const [handoffStatus, setHandoffStatus] = useState<'idle' | 'loading' | 'error'>('idle')
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100)
@@ -62,6 +63,25 @@ export function Laboratorio({ slotId, onBack }: LaboratorioProps) {
     // On mobile, switch to analysis tab when word is clicked
     if (window.innerWidth < 1024) {
       setMobileTab('analise')
+    }
+  }
+
+  const handleOpenAbstinencia = async () => {
+    setHandoffStatus('loading')
+    try {
+      const response = await fetch('/api/handoff/abstinencia', { method: 'POST' })
+      const data = await response.json()
+
+      if (!response.ok || !data?.token) {
+        setHandoffStatus('error')
+        setTimeout(() => setHandoffStatus('idle'), 3000)
+        return
+      }
+
+      window.location.href = `https://abstinenciahelp.vercel.app/handoff?token=${encodeURIComponent(data.token)}`
+    } catch {
+      setHandoffStatus('error')
+      setTimeout(() => setHandoffStatus('idle'), 3000)
     }
   }
 
@@ -92,7 +112,14 @@ export function Laboratorio({ slotId, onBack }: LaboratorioProps) {
 
         <div className="flex items-center gap-2">
           <EternizeMemory slotId={slotId} currentVerse={1} />
-          
+          <button
+            onClick={handleOpenAbstinencia}
+            disabled={handoffStatus === 'loading'}
+            className="p-2 hover:bg-berit-surface rounded-lg transition-berit disabled:opacity-50"
+            aria-label="Abrir AbstinenciaHelp"
+          >
+            <ExternalLink className="w-5 h-5 text-berit-text/50" />
+          </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 hover:bg-berit-surface rounded-lg transition-berit"
@@ -126,6 +153,11 @@ export function Laboratorio({ slotId, onBack }: LaboratorioProps) {
               />
             </button>
           </div>
+          {handoffStatus === 'error' && (
+            <p className="mt-3 text-xs text-red-400">
+              Falha ao abrir AbstinenciaHelp. Tente novamente.
+            </p>
+          )}
         </div>
       )}
 

@@ -5,7 +5,6 @@
  * 
  * CONFIGURAÇÕES:
  * - alwaysCompare: Define se abre direto em modo comparação
- * - accessPassword: Senha de acesso ao sistema
  * - transitionDuration: Duração padrão das transições
  * 
  * MAINTENANCE:
@@ -17,9 +16,6 @@
 export const beritConfig = {
   // Define se o app abre direto no modo de comparação
   alwaysCompare: false,
-  
-  // Senha de acesso ao sistema
-  accessPassword: '06122025',
   
   // Duração das transições em ms
   transitionDuration: 700,

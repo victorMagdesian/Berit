@@ -19,8 +19,9 @@
 
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect, useMemo } from 'react'
+import { useAuth } from '@clerk/nextjs'
+import { createClient, supabaseJwtTemplate } from '@/lib/supabase/client'
 import { Sparkles, Check, Loader2 } from 'lucide-react'
 
 interface EternizeMemoryProps {
@@ -30,7 +31,27 @@ interface EternizeMemoryProps {
 
 export function EternizeMemory({ slotId, currentVerse }: EternizeMemoryProps) {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const supabase = createClient()
+  const { getToken } = useAuth()
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    const loadToken = async () => {
+      const token = await getToken({ template: supabaseJwtTemplate })
+      if (active) {
+        setAccessToken(token ?? null)
+      }
+    }
+
+    loadToken()
+
+    return () => {
+      active = false
+    }
+  }, [getToken])
+
+  const supabase = useMemo(() => createClient(accessToken), [accessToken])
   const isSupabaseAvailable = Boolean(supabase)
 
   const handleEternize = async () => {
