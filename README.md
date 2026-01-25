@@ -22,6 +22,12 @@ HANDOFF_SECRET=uma-chave-longa-e-aleatoria
 HANDOFF_AUD=abstinenciahelp
 ```
 
+## Deploy checklist
+
+- Verifique se `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` e `CLERK_SECRET_KEY` estão configuradas na Vercel.
+- Confirme `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Atualize `BERIT_GATE_PASSPHRASE`, `HANDOFF_SECRET` e `HANDOFF_AUD` conforme o ambiente.
+
 ## Clerk ↔ Supabase (RLS)
 
 1. No Clerk, crie um **JWT Template** chamado `supabase` (ou ajuste `SUPABASE_JWT_TEMPLATE`).
