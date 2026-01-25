@@ -1,11 +1,11 @@
 /**
  * ============================================================================
- * BERIT - Supabase Browser Client (Singleton)
+ * BERIT - Supabase Browser Client
  * ============================================================================
  * 
  * USO:
  * - Importar createClient() em componentes client-side
- * - Singleton pattern evita múltiplas instâncias
+ * - Token do Clerk é injetado via Authorization header
  * 
  * MAINTENANCE:
  * - Usar apenas em 'use client' components
@@ -19,17 +19,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+export const supabaseJwtTemplate =
+  process.env.NEXT_PUBLIC_SUPABASE_JWT_TEMPLATE ?? 'supabase'
 
-let client: ReturnType<typeof createBrowserClient> | null = null
-
-export function createClient() {
+export function createClient(accessToken?: string | null) {
   if (!isSupabaseConfigured) {
     return null
   }
 
-  if (client) return client
-  
-  client = createBrowserClient(supabaseUrl as string, supabaseAnonKey as string)
-  
-  return client
+  return createBrowserClient(supabaseUrl as string, supabaseAnonKey as string, {
+    global: {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    },
+  })
 }

@@ -13,12 +13,10 @@
  * - berit-input: Input customizado com borda inferior
  * 
  * STATES:
- * - 'password': Aguardando senha
  * - 'slots': Exibindo save slots
  * - 'entering': Transição para Laboratório
  * 
  * MAINTENANCE:
- * - Senha configurada em /lib/berit-config.ts
  * - Save slots iniciais em /lib/genesis-data.ts
  * ============================================================================
  */
@@ -37,9 +35,7 @@ interface APortaProps {
 }
 
 export function APorta({ onEnterLaboratory }: APortaProps) {
-  const [state, setState] = useState<'password' | 'slots' | 'entering'>('password')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(false)
+  const [state, setState] = useState<'slots' | 'entering'>('slots')
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -48,19 +44,6 @@ export function APorta({ onEnterLaboratory }: APortaProps) {
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
-
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (password === beritConfig.accessPassword) {
-      setError(false)
-      setState('slots')
-    } else {
-      setError(true)
-      setPassword('')
-      setTimeout(() => setError(false), 2000)
-    }
-  }
 
   const handleSlotSelect = (slotId: string) => {
     setSelectedSlot(slotId)
@@ -90,43 +73,6 @@ export function APorta({ onEnterLaboratory }: APortaProps) {
           {beritConfig.systemSubtitle}
         </p>
       </div>
-
-      {/* Password State */}
-      {state === 'password' && (
-        <form 
-          onSubmit={handlePasswordSubmit}
-          className="w-full max-w-xs transition-berit"
-        >
-          <div className="relative">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Entre a senha"
-              className={`
-                berit-input w-full text-lg
-                ${error ? 'border-red-900 text-red-400' : ''}
-              `}
-              autoFocus
-              autoComplete="off"
-            />
-            {error && (
-              <p className="absolute -bottom-8 left-0 right-0 text-center text-red-400/80 text-sm transition-berit">
-                Acesso negado
-              </p>
-            )}
-          </div>
-          
-          <button
-            type="submit"
-            className="mt-12 w-full py-3 border border-berit-border text-berit-text/80 
-                       hover:border-berit-gold hover:text-berit-gold transition-berit
-                       text-sm tracking-wider uppercase"
-          >
-            Entrar
-          </button>
-        </form>
-      )}
 
       {/* Save Slots State */}
       {state === 'slots' && (

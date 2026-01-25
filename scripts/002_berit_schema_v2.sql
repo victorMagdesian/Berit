@@ -5,11 +5,30 @@
 -- =============================================================================
 
 -- Limpar tabelas existentes (se houver)
+DROP TABLE IF EXISTS berit_access CASCADE;
 DROP TABLE IF EXISTS shared_thoughts CASCADE;
 DROP TABLE IF EXISTS eternal_memories CASCADE;
 DROP TABLE IF EXISTS feedback CASCADE;
 DROP TABLE IF EXISTS app_settings CASCADE;
 DROP TABLE IF EXISTS save_slots CASCADE;
+
+-- Função helper para Clerk JWT (sub)
+CREATE OR REPLACE FUNCTION public.clerk_uid()
+RETURNS TEXT
+LANGUAGE SQL
+STABLE
+AS $$
+  SELECT NULLIF(current_setting('request.jwt.claims', true)::jsonb->>'sub', '')
+$$;
+
+-- Tabela de controle de acesso (Gate)
+CREATE TABLE berit_access (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  clerk_user_id TEXT UNIQUE NOT NULL,
+  activated BOOLEAN NOT NULL DEFAULT FALSE,
+  activated_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 
 -- Tabela de Pensamentos Compartilhados (Realtime)
 -- slot_id é TEXT para corresponder aos IDs como 'genesis-1'
@@ -69,9 +88,20 @@ ALTER TABLE shared_thoughts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE eternal_memories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE berit_access ENABLE ROW LEVEL SECURITY;
 
--- Políticas RLS (acesso público para este app específico - sem auth)
-CREATE POLICY "Allow all access to shared_thoughts" ON shared_thoughts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to eternal_memories" ON eternal_memories FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to feedback" ON feedback FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all access to app_settings" ON app_settings FOR ALL USING (true) WITH CHECK (true);
+-- Políticas RLS (exige Clerk JWT válido)
+CREATE POLICY "Allow authenticated access to shared_thoughts" ON shared_thoughts
+  FOR ALL USING (clerk_uid() IS NOT NULL) WITH CHECK (clerk_uid() IS NOT NULL);
+
+CREATE POLICY "Allow authenticated access to eternal_memories" ON eternal_memories
+  FOR ALL USING (clerk_uid() IS NOT NULL) WITH CHECK (clerk_uid() IS NOT NULL);
+
+CREATE POLICY "Allow authenticated access to feedback" ON feedback
+  FOR ALL USING (clerk_uid() IS NOT NULL) WITH CHECK (clerk_uid() IS NOT NULL);
+
+CREATE POLICY "Allow authenticated access to app_settings" ON app_settings
+  FOR ALL USING (clerk_uid() IS NOT NULL) WITH CHECK (clerk_uid() IS NOT NULL);
+
+CREATE POLICY "Allow user access to berit_access" ON berit_access
+  FOR ALL USING (clerk_user_id = clerk_uid()) WITH CHECK (clerk_user_id = clerk_uid());

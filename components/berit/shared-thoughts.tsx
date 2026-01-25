@@ -23,8 +23,9 @@
 
 import React from "react"
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useAuth } from '@clerk/nextjs'
+import { createClient, supabaseJwtTemplate } from '@/lib/supabase/client'
 import { Users, Wifi, WifiOff } from 'lucide-react'
 
 interface SharedThoughtsProps {
@@ -38,10 +39,29 @@ export function SharedThoughts({ slotId }: SharedThoughtsProps) {
   const [isConnected, setIsConnected] = useState(false)
   const [otherTyping, setOtherTyping] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const supabase = createClient()
+  const { getToken } = useAuth()
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   const debounceRef = useRef<NodeJS.Timeout>()
   const channelRef = useRef<ReturnType<SupabaseClient['channel']> | null>(null)
+  const supabase = useMemo(() => createClient(accessToken), [accessToken])
   const isSupabaseAvailable = Boolean(supabase)
+
+  useEffect(() => {
+    let active = true
+
+    const loadToken = async () => {
+      const token = await getToken({ template: supabaseJwtTemplate })
+      if (active) {
+        setAccessToken(token ?? null)
+      }
+    }
+
+    loadToken()
+
+    return () => {
+      active = false
+    }
+  }, [getToken])
 
   // Load initial content
   useEffect(() => {

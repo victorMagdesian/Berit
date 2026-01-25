@@ -23,6 +23,7 @@ import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Inter, Merriweather } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 
 const inter = Inter({ 
@@ -76,8 +77,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${inter.variable} ${merriweather.variable} bg-black`}>
       <body className="font-sans antialiased berit-grain min-h-screen">
-        {children}
-        <Analytics />
+        <ClerkProvider>
+          {children}
+          <Analytics />
+        </ClerkProvider>
       </body>
     </html>
   )

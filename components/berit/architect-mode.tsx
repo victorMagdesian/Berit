@@ -20,8 +20,9 @@
 
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect, useMemo } from 'react'
+import { useAuth } from '@clerk/nextjs'
+import { createClient, supabaseJwtTemplate } from '@/lib/supabase/client'
 import { beritConfig } from '@/lib/berit-config'
 import { Compass, X, Lightbulb, Bug, Send, Check } from 'lucide-react'
 
@@ -30,8 +31,27 @@ export function ArchitectMode() {
   const [category, setCategory] = useState<'bug' | 'idea' | null>(null)
   const [content, setContent] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
-  const supabase = createClient()
+  const { getToken } = useAuth()
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const supabase = useMemo(() => createClient(accessToken), [accessToken])
   const isSupabaseAvailable = Boolean(supabase)
+
+  useEffect(() => {
+    let active = true
+
+    const loadToken = async () => {
+      const token = await getToken({ template: supabaseJwtTemplate })
+      if (active) {
+        setAccessToken(token ?? null)
+      }
+    }
+
+    loadToken()
+
+    return () => {
+      active = false
+    }
+  }, [getToken])
 
   const handleSubmit = async () => {
     if (!category || !content.trim() || !supabase) return
