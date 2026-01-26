@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 const hasClerkKeys =
   !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
@@ -22,7 +23,7 @@ export default clerkMiddleware((auth, req) => {
     console.error(
       '[middleware] Missing Clerk environment variables. Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY.'
     )
-    return
+    return NextResponse.next()
   }
 
   if (!isPublicRoute(req)) {
